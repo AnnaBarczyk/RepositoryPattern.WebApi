@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Domain.Interfaces;
 using DataAccess.EFCore.Repositories;
+using DataAccess.EFCore.UnitOfWork;
 
 namespace WebApi
 {
@@ -37,6 +38,8 @@ namespace WebApi
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddTransient<IDeveloperRepository, DeveloperRepository>();
             services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddControllers();
             #endregion
         }
 
@@ -48,14 +51,15 @@ namespace WebApi
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
+
             app.UseRouting();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                endpoints.MapControllers();
             });
         }
     }
